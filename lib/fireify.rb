@@ -1,4 +1,4 @@
-require "fireify/version"
+require 'fireify/version'
 
 module Fireify
   # Your code goes here...
