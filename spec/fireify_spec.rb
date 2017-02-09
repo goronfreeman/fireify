@@ -38,4 +38,25 @@ describe Fireify::Verify do
         .to raise_error(Fireify::InvalidAlgorithmError)
     end
   end
+
+  describe '#verify_kid' do
+    let(:header) { { 'alg' => 'RS256', 'kid' => '00c635a74a0d749cbb7177dc4bb917929814be5c' } }
+    let(:valid_certificates) { JSON.parse(File.read(File.join(CERT_PATH, 'rs256.json'))) }
+    let(:valid_kid) { '00c635a74a0d749cbb7177dc4bb917929814be5c' }
+    let(:invalid_kid) { 'notavalidkid' }
+
+
+    before do
+      fireify.instance_variable_set(:@header, header)
+    end
+
+    it 'returns true if the kid claim is the key to a valid certificate' do
+      expect(fireify.send(:verify_kid, valid_kid, valid_certificates)).to be true
+    end
+
+    it 'raises Fireify::InvalidAlgorithmError if the hash algorithm does not equal "RS256"' do
+      expect { fireify.send(:verify_kid, invalid_kid, valid_certificates) }
+        .to raise_error(Fireify::InvalidKeyIdError)
+    end
+  end
 end
