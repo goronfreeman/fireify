@@ -1,5 +1,5 @@
 require 'fireify/version'
+require 'fireify/verify'
 
 module Fireify
-  # Your code goes here...
 end
