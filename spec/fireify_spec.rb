@@ -197,31 +197,31 @@ describe Fireify::Verify do
         fireify.send(:verify_payload)
       end
     end
+  end
 
-    describe '#verify_subject' do
-      it 'returns if sub is a non-empty string' do
-        payload = base_payload
-        fireify.instance_variable_set(:@payload, payload)
+  describe '#verify_subject' do
+    it 'returns if sub is a non-empty string' do
+      payload = base_payload
+      fireify.instance_variable_set(:@payload, payload)
 
-        expect(fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']))
-          .to be_nil
-      end
+      expect(fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']))
+        .to be_nil
+    end
 
-      it 'raises Fireify::InvalidSubError if sub is an empty string' do
-        payload = base_payload.merge('sub' => '')
-        fireify.instance_variable_set(:@payload, payload)
+    it 'raises Fireify::InvalidSubError if sub is an empty string' do
+      payload = base_payload.merge('sub' => '')
+      fireify.instance_variable_set(:@payload, payload)
 
-        expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
-          .to raise_error(Fireify::InvalidSubError)
-      end
+      expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
+        .to raise_error(Fireify::InvalidSubError)
+    end
 
-      it 'raises Fireify::InvalidSubError if sub is nil' do
-        payload = base_payload.merge('sub' => nil)
-        fireify.instance_variable_set(:@payload, payload)
+    it 'raises Fireify::InvalidSubError if sub is nil' do
+      payload = base_payload.merge('sub' => nil)
+      fireify.instance_variable_set(:@payload, payload)
 
-        expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
-          .to raise_error(Fireify::InvalidSubError)
-      end
+      expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
+        .to raise_error(Fireify::InvalidSubError)
     end
   end
 end
