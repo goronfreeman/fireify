@@ -5,7 +5,7 @@ CERT_PATH = File.join(File.dirname(__FILE__), 'fixtures', 'certs')
 describe Fireify::Verify do
   let(:fireify) { Fireify::Verify.new }
   let(:token) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjg2NTQ4NjU0NjI2MiwidiI6MCwiZCI6eyJ1aWQiOiJrYXRvIn0sImlhdCI6MTQ4NjYzMjY2Mn0.Q91UVaOcZY2Ci2qiyqqwhx2XIyaR_oPCqMnEujnGnVA' }
-  let(:base_payload) { { 'aud' => 'fireify', 'iss' => 'https://securetoken.google.com/fireify' } }
+  let(:base_payload) { { 'aud' => 'fireify', 'iss' => 'https://securetoken.google.com/fireify', 'sub' => 'mysubject' } }
 
   before do
     fireify.instance_variable_set(:@project_id, 'fireify')
@@ -184,6 +184,43 @@ describe Fireify::Verify do
 
         expect { fireify.send(:verify_payload) }
           .to raise_error(JWT::InvalidIssuerError)
+      end
+    end
+
+    describe 'subject' do
+      it 'calls #verify_subject with the appropriate arguments' do
+        payload = base_payload
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify).to receive(:verify_sub)
+          .with(fireify.instance_variable_get(:@payload)['sub'])
+        fireify.send(:verify_payload)
+      end
+    end
+
+    describe '#verify_subject' do
+      it 'returns if sub is a non-empty string' do
+        payload = base_payload
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']))
+          .to be_nil
+      end
+
+      it 'raises Fireify::InvalidSubError if sub is an empty string' do
+        payload = base_payload.merge('sub' => '')
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
+          .to raise_error(Fireify::InvalidSubError)
+      end
+
+      it 'raises Fireify::InvalidSubError if sub is nil' do
+        payload = base_payload.merge('sub' => nil)
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
+          .to raise_error(Fireify::InvalidSubError)
       end
     end
   end

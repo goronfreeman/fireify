@@ -41,6 +41,12 @@ module Fireify
       jwt.verify_iat
       jwt.verify_aud
       jwt.verify_iss
+      verify_sub(@payload['sub'])
+    end
+
+    def verify_sub(sub)
+      return unless sub.nil? || sub.empty?
+      raise(Fireify::InvalidSubError, "Invalid subject. Expected a non-empty string, received #{sub} || <none>")
     end
   end
 end
