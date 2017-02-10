@@ -1,4 +1,3 @@
-require 'base64'
 require 'json'
 require 'jwt'
 require 'net/http'
@@ -47,6 +46,13 @@ module Fireify
     def verify_sub(sub)
       return unless sub.nil? || sub.empty?
       raise(Fireify::InvalidSubError, "Invalid subject. Expected a non-empty string, received #{sub} || <none>")
+    end
+
+    def verify_signature(token)
+      cert = OpenSSL::X509::Certificate.new(@valid_certificates[@header['kid']])
+      public_key = cert.public_key
+
+      JWT.decode(token, public_key, true, algorithm: 'RS256')
     end
   end
 end

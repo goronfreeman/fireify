@@ -1,14 +1,29 @@
 require 'fireify'
+require 'pry-byebug'
 
 CERT_PATH = File.join(File.dirname(__FILE__), 'fixtures', 'certs')
 
 describe Fireify::Verify do
   let(:fireify) { Fireify::Verify.new }
-  let(:token) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjg2NTQ4NjU0NjI2MiwidiI6MCwiZCI6eyJ1aWQiOiJrYXRvIn0sImlhdCI6MTQ4NjYzMjY2Mn0.Q91UVaOcZY2Ci2qiyqqwhx2XIyaR_oPCqMnEujnGnVA' }
+  let(:token) { create_custom_token }
   let(:base_payload) { { 'aud' => 'fireify', 'iss' => 'https://securetoken.google.com/fireify', 'sub' => 'mysubject' } }
 
   before do
     fireify.instance_variable_set(:@project_id, 'fireify')
+
+    def create_custom_token
+      project_id = 'fireify'
+      private_key = OpenSSL::PKey.read(File.read(File.join(CERT_PATH, 'rs256-private.pem')))
+      now_seconds = Time.now.to_i
+      payload = { aud: project_id,
+                  iss: "https://securetoken.google.com/#{project_id}",
+                  sub: 'mysubject',
+                  iat: now_seconds,
+                  exp: now_seconds + (60 * 60) }
+      JWT.encode(payload, private_key, 'RS256')
+    end
+
+    fireify.send(:parse_token, token)
   end
 
   describe '#parse_token' do
@@ -228,6 +243,21 @@ describe Fireify::Verify do
 
       expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
         .to raise_error(Fireify::InvalidSubError)
+    end
+  end
+
+  describe '#verify_signature' do
+    it 'returns an array with the payload and header if signature is valid' do
+      fireify.instance_variable_get(:@header)['kid'] = '00c635a74a0d749cbb7177dc4bb917929814be5c'
+
+      certs = JSON.parse(File.read(File.join(CERT_PATH, 'rs256.json')))
+      fireify.instance_variable_set(:@valid_certificates, certs)
+
+      expect(fireify.send(:verify_signature, token))
+        .to match_array(
+          [fireify.instance_variable_get(:@payload),
+           fireify.instance_variable_get(:@header).tap { |x| x.delete('kid') }]
+        )
     end
   end
 end
