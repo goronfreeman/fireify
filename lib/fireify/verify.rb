@@ -33,12 +33,14 @@ module Fireify
     end
 
     def verify_payload
-      options = { aud: @project_id, verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
+      uri = "https://securetoken.google.com/#{@project_id}"
+      options = { aud: @project_id, iss: uri, verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
       jwt = JWT::Verify.new(@payload, options)
 
       jwt.verify_expiration
       jwt.verify_iat
       jwt.verify_aud
+      jwt.verify_iss
     end
   end
 end

@@ -5,6 +5,11 @@ CERT_PATH = File.join(File.dirname(__FILE__), 'fixtures', 'certs')
 describe Fireify::Verify do
   let(:fireify) { Fireify::Verify.new }
   let(:token) { 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjg2NTQ4NjU0NjI2MiwidiI6MCwiZCI6eyJ1aWQiOiJrYXRvIn0sImlhdCI6MTQ4NjYzMjY2Mn0.Q91UVaOcZY2Ci2qiyqqwhx2XIyaR_oPCqMnEujnGnVA' }
+  let(:base_payload) { { 'aud' => 'fireify', 'iss' => 'https://securetoken.google.com/fireify' } }
+
+  before do
+    fireify.instance_variable_set(:@project_id, 'fireify')
+  end
 
   describe '#parse_token' do
     before do
@@ -112,7 +117,7 @@ describe Fireify::Verify do
   describe '#verify_payload' do
     describe 'expiration time' do
       it 'returns if exp is in the future' do
-        payload = { 'exp' => 865486546262 }
+        payload = base_payload.merge('exp' => 865486546262)
         fireify.instance_variable_set(:@payload, payload)
 
         expect(fireify.send(:verify_payload)).to be_nil
@@ -129,7 +134,7 @@ describe Fireify::Verify do
 
     describe 'issued-at time' do
       it 'returns if iat is in the past' do
-        payload = { 'iat' => 1486627962 }
+        payload = base_payload.merge('iat' => 1486627962)
         fireify.instance_variable_set(:@payload, payload)
 
         expect(fireify.send(:verify_payload)).to be_nil
@@ -150,18 +155,35 @@ describe Fireify::Verify do
       end
 
       it 'returns if aud matches Firebase project ID' do
-        payload = { 'aud' => 'fireify' }
+        payload = base_payload
         fireify.instance_variable_set(:@payload, payload)
 
         expect(fireify.send(:verify_payload)).to be_nil
       end
 
       it 'raises JWT::InvalidAudError if aud does not match Firebase project ID' do
-        payload = { 'aud' => 'other' }
+        payload = base_payload.merge('aud' => 'waterify')
         fireify.instance_variable_set(:@payload, payload)
 
         expect { fireify.send(:verify_payload) }
           .to raise_error(JWT::InvalidAudError)
+      end
+    end
+
+    describe 'issuer' do
+      it 'returns if iss matches https://securetoken.google.com/<projectId>' do
+        payload = base_payload
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify.send(:verify_payload)).to be_nil
+      end
+
+      it 'raises JWT::InvalidIssuerError if iss does not match https://securetoken.google.com/<projectId>' do
+        payload = base_payload.merge('iss' => 'https://securetoken.google.com/waterify')
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_payload) }
+          .to raise_error(JWT::InvalidIssuerError)
       end
     end
   end
