@@ -109,4 +109,23 @@ describe Fireify::Verify do
         .to raise_error(Fireify::InvalidKeyIdError)
     end
   end
+
+  describe '#verify_payload' do
+    describe 'expiration time' do
+      it 'returns if exp is in the future' do
+        payload = { 'exp' => 865486546262 }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify.send(:verify_payload)).to be_nil
+      end
+
+      it 'raises JWT::ExpiredSignature if exp is in the past' do
+        payload = { 'exp' => 1486631562 }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_payload) }
+          .to raise_error(JWT::ExpiredSignature)
+      end
+    end
+  end
 end
