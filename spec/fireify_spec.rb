@@ -127,5 +127,22 @@ describe Fireify::Verify do
           .to raise_error(JWT::ExpiredSignature)
       end
     end
+
+    describe 'issued-at time' do
+      it 'returns if iat is in the past' do
+        payload = { 'iat' => 1486627962 }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify.send(:verify_payload)).to be_nil
+      end
+
+      it 'raises JWT::InvalidIatError if iat is in the future' do
+        payload = { 'iat' => 865486546262 }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_payload) }
+          .to raise_error(JWT::InvalidIatError)
+      end
+    end
   end
 end

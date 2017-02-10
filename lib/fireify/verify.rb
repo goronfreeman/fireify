@@ -37,6 +37,7 @@ module Fireify
       jwt = JWT::Verify.new(@payload, options)
 
       jwt.verify_expiration
+      jwt.verify_iat
     end
   end
 end
