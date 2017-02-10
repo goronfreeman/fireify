@@ -17,6 +17,11 @@ module Fireify
       @valid_certificates = JSON.parse(Net::HTTP.get(uri))
     end
 
+    def verify_header
+      verify_alg(@header['alg'])
+      verify_kid(@header['kid'], @valid_certificates)
+    end
+
     def verify_alg(alg)
       return true if alg == 'RS256'
       raise(Fireify::InvalidAlgorithmError, "Invalid algorithm. Expected RS256, received #{@header['alg'] || '<none>'}")

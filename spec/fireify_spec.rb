@@ -40,6 +40,34 @@ describe Fireify::Verify do
     end
   end
 
+  describe '#verify_header' do
+    let(:header) { { 'alg' => 'RS256', 'kid' => '00c635a74a0d749cbb7177dc4bb917929814be5c' } }
+    let(:valid_certificates) { JSON.parse(File.read(File.join(CERT_PATH, 'rs256.json'))) }
+
+    before do
+      fireify.instance_variable_set(:@header, header)
+      certs = JSON.parse(File.read(File.join(CERT_PATH, 'rs256.json')))
+      fireify.instance_variable_set(:@valid_certificates, certs)
+    end
+
+    after do
+      fireify.send(:verify_header)
+    end
+
+    it 'calls #verify_alg with the appropriate arguments' do
+      expect(fireify).to receive(:verify_alg)
+        .with(fireify.instance_variable_get(:@header)['alg'])
+    end
+
+    it 'calls #verify_kid with the appropriate arguments' do
+      expect(fireify).to receive(:verify_kid)
+        .with(
+          fireify.instance_variable_get(:@header)['kid'],
+          fireify.instance_variable_get(:@valid_certificates)
+        )
+    end
+  end
+
   describe '#verify_alg' do
     let(:header) { { 'alg' => 'RS256' } }
     let(:valid_alg) { 'RS256' }
