@@ -17,11 +17,13 @@ describe Fireify::Verify do
     end
 
     it 'assigns @header' do
-      expect(fireify.instance_variable_get(:@header)).to_not be_nil
+      expect(fireify.instance_variable_get(:@header))
+        .not_to be_nil
     end
 
     it 'assigns @payload' do
-      expect(fireify.instance_variable_get(:@payload)).to_not be_nil
+      expect(fireify.instance_variable_get(:@payload))
+        .not_to be_nil
     end
   end
 
@@ -32,7 +34,7 @@ describe Fireify::Verify do
 
     it 'assigns @valid_certificates' do
       expect(fireify.instance_variable_get(:@valid_certificates))
-        .to_not be_nil
+        .not_to be_nil
     end
 
     it 'retrieves the latest certificates from Google' do
@@ -83,8 +85,8 @@ describe Fireify::Verify do
     end
 
     it 'returns if the hash algorithm equals "RS256"' do
-      expect(fireify.send(:verify_alg, valid_alg))
-        .to be_nil
+      expect { fireify.send(:verify_alg, valid_alg) }
+        .not_to raise_error
     end
 
     it 'raises Fireify::InvalidAlgorithmError if the hash algorithm does not equal "RS256"' do
@@ -104,8 +106,8 @@ describe Fireify::Verify do
     end
 
     it 'returns if the kid claim is the key to a valid certificate' do
-      expect(fireify.send(:verify_kid, valid_kid, valid_certificates))
-        .to be_nil
+      expect { fireify.send(:verify_kid, valid_kid, valid_certificates) }
+        .not_to raise_error
     end
 
     it 'raises Fireify::InvalidAlgorithmError if the hash algorithm does not equal "RS256"' do
@@ -120,7 +122,8 @@ describe Fireify::Verify do
         payload = base_payload.merge('exp' => 865486546262)
         fireify.instance_variable_set(:@payload, payload)
 
-        expect(fireify.send(:verify_payload)).to be_nil
+        expect { fireify.send(:verify_payload) }
+          .not_to raise_error
       end
 
       it 'raises JWT::ExpiredSignature if exp is in the past' do
@@ -137,7 +140,8 @@ describe Fireify::Verify do
         payload = base_payload.merge('iat' => 1486627962)
         fireify.instance_variable_set(:@payload, payload)
 
-        expect(fireify.send(:verify_payload)).to be_nil
+        expect { fireify.send(:verify_payload) }
+          .not_to raise_error
       end
 
       it 'raises JWT::InvalidIatError if iat is in the future' do
@@ -158,7 +162,8 @@ describe Fireify::Verify do
         payload = base_payload
         fireify.instance_variable_set(:@payload, payload)
 
-        expect(fireify.send(:verify_payload)).to be_nil
+        expect { fireify.send(:verify_payload) }
+          .not_to raise_error
       end
 
       it 'raises JWT::InvalidAudError if aud does not match Firebase project ID' do
@@ -175,7 +180,8 @@ describe Fireify::Verify do
         payload = base_payload
         fireify.instance_variable_set(:@payload, payload)
 
-        expect(fireify.send(:verify_payload)).to be_nil
+        expect { fireify.send(:verify_payload) }
+          .not_to raise_error
       end
 
       it 'raises JWT::InvalidIssuerError if iss does not match https://securetoken.google.com/<projectId>' do
@@ -204,8 +210,8 @@ describe Fireify::Verify do
       payload = base_payload
       fireify.instance_variable_set(:@payload, payload)
 
-      expect(fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']))
-        .to be_nil
+      expect { fireify.send(:verify_sub, fireify.instance_variable_get(:@payload)['sub']) }
+        .not_to raise_error
     end
 
     it 'raises Fireify::InvalidSubError if sub is an empty string' do
