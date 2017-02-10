@@ -77,8 +77,9 @@ describe Fireify::Verify do
       fireify.instance_variable_set(:@header, header)
     end
 
-    it 'returns true if the hash algorithm equals "RS256"' do
-      expect(fireify.send(:verify_alg, valid_alg)).to be true
+    it 'returns if the hash algorithm equals "RS256"' do
+      expect(fireify.send(:verify_alg, valid_alg))
+        .to be_nil
     end
 
     it 'raises Fireify::InvalidAlgorithmError if the hash algorithm does not equal "RS256"' do
@@ -98,8 +99,9 @@ describe Fireify::Verify do
       fireify.instance_variable_set(:@header, header)
     end
 
-    it 'returns true if the kid claim is the key to a valid certificate' do
-      expect(fireify.send(:verify_kid, valid_kid, valid_certificates)).to be true
+    it 'returns if the kid claim is the key to a valid certificate' do
+      expect(fireify.send(:verify_kid, valid_kid, valid_certificates))
+        .to be_nil
     end
 
     it 'raises Fireify::InvalidAlgorithmError if the hash algorithm does not equal "RS256"' do
