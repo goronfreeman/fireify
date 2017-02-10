@@ -20,6 +20,26 @@ describe Fireify::Verify do
     end
   end
 
+  describe '#retrieve_certificates' do
+    before do
+      fireify.send(:retrieve_certificates)
+    end
+
+    it 'assigns @valid_certificates' do
+      expect(fireify.instance_variable_get(:@valid_certificates))
+        .to_not be_nil
+    end
+
+    it 'retrieves the latest certificates from Google' do
+      expect(
+        fireify.instance_variable_get(:@valid_certificates)
+               .values
+               .map { |val| val.start_with?('-----BEGIN CERTIFICATE-----') }
+               .uniq
+      ).to eq([true])
+    end
+  end
+
   describe '#verify_alg' do
     let(:header) { { 'alg' => 'RS256' } }
     let(:valid_alg) { 'RS256' }

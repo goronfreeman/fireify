@@ -1,6 +1,7 @@
 require 'base64'
 require 'json'
 require 'jwt'
+require 'net/http'
 
 module Fireify
   class Verify
@@ -9,6 +10,11 @@ module Fireify
     def parse_token(token)
       @header = JSON.parse(Base64.urlsafe_decode64(token.split('.')[0]))
       @payload = JSON.parse(Base64.urlsafe_decode64(token.split('.')[1]))
+    end
+
+    def retrieve_certificates
+      uri = URI('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com')
+      @valid_certificates = JSON.parse(Net::HTTP.get(uri))
     end
 
     def verify_alg(alg)
