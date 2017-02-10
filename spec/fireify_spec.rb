@@ -94,7 +94,6 @@ describe Fireify::Verify do
     let(:valid_kid) { '00c635a74a0d749cbb7177dc4bb917929814be5c' }
     let(:invalid_kid) { 'notavalidkid' }
 
-
     before do
       fireify.instance_variable_set(:@header, header)
     end
@@ -142,6 +141,27 @@ describe Fireify::Verify do
 
         expect { fireify.send(:verify_payload) }
           .to raise_error(JWT::InvalidIatError)
+      end
+    end
+
+    describe 'audience' do
+      before do
+        fireify.instance_variable_set(:@project_id, 'fireify')
+      end
+
+      it 'returns if aud matches Firebase project ID' do
+        payload = { 'aud' => 'fireify' }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect(fireify.send(:verify_payload)).to be_nil
+      end
+
+      it 'raises JWT::InvalidAudError if aud does not match Firebase project ID' do
+        payload = { 'aud' => 'other' }
+        fireify.instance_variable_set(:@payload, payload)
+
+        expect { fireify.send(:verify_payload) }
+          .to raise_error(JWT::InvalidAudError)
       end
     end
   end

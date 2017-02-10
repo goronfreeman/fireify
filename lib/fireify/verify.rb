@@ -33,11 +33,12 @@ module Fireify
     end
 
     def verify_payload
-      options = { verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
+      options = { aud: @project_id, verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
       jwt = JWT::Verify.new(@payload, options)
 
       jwt.verify_expiration
       jwt.verify_iat
+      jwt.verify_aud
     end
   end
 end
