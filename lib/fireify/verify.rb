@@ -1,9 +1,26 @@
+require 'fireify/error'
 require 'json'
 require 'jwt'
 require 'net/http'
 
 module Fireify
   class Verify
+    attr_reader :project_id
+
+    def initialize(project_id)
+      @project_id = project_id
+    end
+
+    def verify_token(token)
+      parse_token(token)
+      retrieve_certificates
+      verify_header
+      verify_payload
+      verify_signature(token)
+
+      @payload['sub']
+    end
+
     private
 
     def parse_token(token)
