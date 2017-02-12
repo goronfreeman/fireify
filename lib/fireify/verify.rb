@@ -1,3 +1,5 @@
+require 'fireify'
+require 'fireify/configuration'
 require 'fireify/error'
 require 'json'
 require 'jwt'
@@ -5,12 +7,6 @@ require 'net/http'
 
 module Fireify
   class Verify
-    attr_reader :project_id
-
-    def initialize(project_id)
-      @project_id = project_id
-    end
-
     def verify_token(token)
       parse_token(token)
       retrieve_certificates
@@ -49,8 +45,8 @@ module Fireify
     end
 
     def verify_payload
-      uri = "https://securetoken.google.com/#{@project_id}"
-      options = { aud: @project_id, iss: uri, verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
+      uri = "https://securetoken.google.com/#{Fireify.configuration.project_id}"
+      options = { aud: Fireify.configuration.project_id, iss: uri, verify_iat: true, verify_aud: true, verify_iss: true, verify_sub: true, leeway: 0 }
       jwt = JWT::Verify.new(@payload, options)
 
       jwt.verify_expiration

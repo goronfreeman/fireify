@@ -4,15 +4,19 @@ require 'pry-byebug'
 CERT_PATH = File.join(File.dirname(__FILE__), 'fixtures', 'certs')
 
 describe Fireify::Verify do
-  let(:fireify) { Fireify::Verify.new('fireify') }
+  let(:fireify) { Fireify::Verify.new }
   let(:token) { create_custom_token }
 
   before do
+    Fireify.configure do |config|
+      config.project_id = 'fireify'
+    end
+
     def create_custom_token
       private_key = OpenSSL::PKey.read(File.read(File.join(CERT_PATH, 'rs256-private.pem')))
       now_seconds = Time.now.to_i
-      payload = { aud: fireify.project_id,
-                  iss: "https://securetoken.google.com/#{fireify.project_id}",
+      payload = { aud: Fireify.configuration.project_id,
+                  iss: "https://securetoken.google.com/#{Fireify.configuration.project_id}",
                   sub: 'mysubject',
                   iat: now_seconds,
                   exp: now_seconds + (60 * 60) }
