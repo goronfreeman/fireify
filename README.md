@@ -1,8 +1,6 @@
 # Fireify
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/fireify`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+[Firebase](https://firebase.google.com/) token verification for Ruby on Rails.
 
 ## Installation
 
@@ -16,21 +14,72 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
+Run Fireify's generator:
 
-    $ gem install fireify
+    $ rails generate fireify:install
+
+And then edit the initializer created at `config/initializers.fireify.rb` with
+your project's Firebase project ID. You should utilize an environment variable
+to store your project ID:
+
+```ruby
+Fireify.configure do |config|
+  # You can find this value in your project's Firebase console.
+  config.project_id = Rails.application.secrets.firebase[:project_id]
+end
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+Utilize Fireify to ensure tokens sent to your application meet the constraints
+specified in the Firebase [documentation](https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library).
+
+Basic usage of Fireify to create a user account from a token:
+
+```ruby
+fireify = Fireify::Verify.new
+token = 'my_firebase_token'
+
+fireify.verify_token(token) # Assuming the token passes verificiation.
+
+User.create(
+  email: fireify.account_details['email'],
+  name: fireify.account_details['name'],
+  picture: fireify.account_details['picture']
+)
+```
+
+`fireify.account_details` returns a hash of user account details that you can
+use to populate whatever database fields make sense for your application.
+
+```ruby
+{
+  "iss" => "https://securetoken.google.com/firebase-project-id",
+  "name" => "John Doe",
+  "picture" => "link-to-user-photo.jpg",
+  "aud" => "firebase-project-id",
+  "auth_time" => 1487014530,
+  "user_id" => "uuid",
+  "sub" => "uuid",
+  "iat" => 1487014531,
+  "exp" => 1487018131,
+  "email" => "john.doe@example.com",
+  "email_verified" => true,
+  "firebase" => {
+    "identities" => {
+      "google.com" => ["identifier"],
+      "email" => ["john.doe@example.com"]
+    },
+    "sign_in_provider" => "google.com"}
+}
+```
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/Hunter Braun/fireify.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/goronfreeman/fireify.
