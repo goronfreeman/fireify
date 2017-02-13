@@ -40,7 +40,7 @@ Basic usage of Fireify to create a user account from a token:
 fireify = Fireify::Verify.new
 token = 'my_firebase_token'
 
-fireify.verify_token(token) # Assuming the token passes verificiation.
+fireify.verify_token(token) # Assuming the token passes verification.
 
 User.create(
   email: fireify.account_details['email'],
@@ -70,9 +70,30 @@ use to populate whatever database fields make sense for your application.
       "google.com" => ["identifier"],
       "email" => ["john.doe@example.com"]
     },
-    "sign_in_provider" => "google.com"}
+    "sign_in_provider" => "google.com"
+  }
 }
 ```
+
+### Exceptions
+
+Verifying a Firebase token takes several steps, and it can fail at any point in
+the process. Fireify will return a descriptive exception at the point where
+token verification failed, and you can handle those in whatever way makes
+sense for your application.
+
+Below is a list of the different exceptions that may be raised, along with a short
+description:
+
+| Exception Name  | Description |
+| ------------- | ------------- |
+| `Fireify::InvalidAlgorithmError`  | The `alg` claim is not RS256 |
+| `Fireify::InvalidKeyIdError`  | The `kid` claim does not correspond to a valid public key |
+| `JWT::ExpiredSignature` | The `exp` claim is in the past |
+| `JWT::InvalidIatError` | The `iat` claim is in the future |
+| `JWT::InvalidAudError` | The `aud` claim does not match the supplied Firebase project ID |
+| `JWT::InvalidIssuerError` | The `iss` claim does not match the supplied Firebase project ID |
+| `Fireify::InvalidSubError` | The `sub` claim is missing or empty |
 
 ## Development
 
