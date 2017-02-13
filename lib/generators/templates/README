@@ -1,0 +1,8 @@
+===============================================================================
+
+Some setup you must do manually if you haven't yet:
+
+  Ensure you have set your project's Firebase project ID in config/initializers/fireify.rb.
+  You can find this value in your Firebase console.
+
+===============================================================================

@@ -8,8 +8,10 @@ module Fireify
 
       def copy_initializer
         template 'initializer.rb', 'config/initializers/fireify.rb'
+      end
 
-        # TODO: Write a post install message
+      def show_readme
+        readme 'README'
       end
     end
   end
