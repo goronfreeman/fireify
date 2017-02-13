@@ -5,4 +5,10 @@ Some setup you must do manually if you haven't yet:
   Ensure you have set your project's Firebase project ID in config/initializers/fireify.rb.
   You can find this value in your Firebase console.
 
+  You should store your project ID as an environment variable:
+
+    Fireify.configure do |config|
+      config.project_id = Rails.application.secrets.firebase[:project_id]
+    end
+
 ===============================================================================
