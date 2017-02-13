@@ -7,6 +7,8 @@ require 'net/http'
 
 module Fireify
   class Verify
+    attr_reader :account_details
+
     def verify_token(token)
       parse_token(token)
       retrieve_certificates
@@ -14,7 +16,8 @@ module Fireify
       verify_payload
       verify_signature(token)
 
-      @payload['sub']
+      @account_details = @payload
+      @account_details
     end
 
     private
