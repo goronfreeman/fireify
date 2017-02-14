@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Hunter Braun']
   spec.email         = ['hunter.braun@gmail.com']
 
-  spec.summary       = 'Simple Firebase authentication for Ruby on Rails.'
-  spec.description   = 'Simple Firebase authentication for Ruby on Rails.'
+  spec.summary       = 'Simple Firebase token verification for Ruby on Rails.'
+  spec.description   = 'Simple Firebase token verification for Ruby on Rails.'
   spec.homepage      = 'https://github.com/goronfreeman/fireify'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -35,5 +35,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.5'
-  spec.add_development_dependency 'pry-byebug'
 end
