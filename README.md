@@ -1,6 +1,7 @@
 # Fireify
 
-[Firebase](https://firebase.google.com/) token verification for Ruby on Rails.
+Simple [Firebase](https://firebase.google.com/) token verification for Ruby on Rails
+using [ruby-jwt](https://github.com/jwt/ruby-jwt).
 
 ## Installation
 
