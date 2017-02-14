@@ -1,5 +1,4 @@
 require 'fireify/verify'
-require 'pry-byebug'
 
 CERT_PATH = File.join(File.dirname(__FILE__), 'fixtures', 'certs')
 
