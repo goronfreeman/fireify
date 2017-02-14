@@ -17,7 +17,6 @@ module Fireify
       verify_signature(token)
 
       @account_details = @payload
-      @account_details
     end
 
     private
